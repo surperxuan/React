@@ -1,15 +1,37 @@
 // 负责调用beginWork和completeWork
-import { FiberNode } from './fiber';
+import { createWorkInProgress, FiberNode, FiberRootNode } from './fiber';
 import { beginWork } from './beginWork';
 import { completeWork } from './completeWork';
+import { HostRoot } from './workTags';
 
 let workInProgress: FiberNode | null = null;
 
-function prepareFreshStack(fiber: FiberNode) {
-	workInProgress = fiber;
+function prepareFreshStack(root: FiberRootNode) {
+	workInProgress = createWorkInProgress(root.current, {});
 }
 
-function renderRoot(root: FiberNode) {
+export function scheduleUpdateOnFiber(fiber: FiberNode) {
+	// TODO 调度功能
+	// this.setState触发更新时需要先向上找到根节点root
+	const root = markUpdateFromFiberToRoot(fiber);
+	renderRoot(root);
+}
+
+// return属性指向父节点【到hostRootFiber】，然后hostRootFiber的stateNode指向FiberRootNode，返回FiberRootNode
+function markUpdateFromFiberToRoot(fiber: FiberNode) {
+	let node = fiber;
+	let parent = node.return;
+	while (parent !== null) {
+		node = parent;
+		parent = node.return;
+	}
+	if (node.tag === HostRoot) {
+		return node.stateNode;
+	}
+	return null;
+}
+
+function renderRoot(root: FiberRootNode) {
 	// 初始化
 	prepareFreshStack(root);
 	do {
