@@ -1,5 +1,5 @@
-import { Props, Key, Ref } from 'shared/ReactTypes';
-import { WorkTag } from './workTags';
+import { Props, Key, Ref, ReactElementType } from 'shared/ReactTypes';
+import { FunctionComponent, HostComponent, WorkTag } from './workTags';
 import { Flags, NoFlags } from './fiberFlags';
 import { Container } from 'hostConfig';
 
@@ -8,6 +8,7 @@ export class FiberNode {
 	tag: WorkTag;
 	pendingProps: Props;
 	key: Key;
+	// 指向当前class组件实例（this），可以调用上面的方法属性state
 	stateNode: any;
 	type: any;
 	return: FiberNode | null;
@@ -16,6 +17,7 @@ export class FiberNode {
 	index: number;
 	ref: Ref;
 	memoizedProps: Props | null;
+	// 链表结构，存储函数组件的hook(useState等)，所以hook不能嵌套在if中，要保持hook的调用顺序(链表结构)
 	memoizedState: any;
 	// 指向与当前FiberNode对应的节点 current|workInProgress【current当前FiberNode;workInProgress新生成的即将更新的FiberNode】双缓冲
 	alternate: Props | null;
@@ -96,3 +98,18 @@ export const createWorkInProgress = (
 	wip.memoizedState = current.memoizedState;
 	return wip;
 };
+
+export function createFiberFromElement(element: ReactElementType) {
+	const { type, key, props } = element;
+	let fiberTag: WorkTag = FunctionComponent;
+
+	if (typeof type === 'string') {
+		// <div /> type: 'div'
+		fiberTag = HostComponent;
+	} else if (typeof type !== 'function' && __DEV__) {
+		console.warn('未定义的type类型', element);
+	}
+	const fiber = new FiberNode(fiberTag, props, key);
+	fiber.type = type;
+	return fiber;
+}

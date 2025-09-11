@@ -12,13 +12,13 @@ import { scheduleUpdateOnFiber } from './workLoop';
 
 // createRoot 方法
 export function createContainer(container: Container) {
-	const hostRootFiber = new FiberNode(HostRoot, {}, null);
-	const root = new FiberRootNode(container, hostRootFiber);
+	const hostRootFiber = new FiberNode(HostRoot, {}, null); // 生成hostRootFiber节点
+	const root = new FiberRootNode(container, hostRootFiber); // 生成FiberRootNode根节点
 	hostRootFiber.updateQueue = createUpdateQueue();
 	return root;
 }
 
-// render方法内部调用用于更新
+// render方法内部调用用于更新 this.setState
 export function updateContainer(
 	element: ReactElementType | null,
 	root: FiberRootNode

@@ -11,3 +11,4 @@ Fiber 节点（虚拟 DOM）作为 ReactElement 节点和真实 UI 节点之间�
 Update 放入 UpdateQueue【队列】中用于排队更新
 ![ReactDOM.createRoot(rootElement).render(<App/>)](images/image.png)
 更新机制->由触发更新的节点（setState）向上找到根节点，初始化创建 updateQueue；从根节点开始递归生成新的 FiberTree【workInProgress】
+9.10 实现递归算法的向下查找（递）
